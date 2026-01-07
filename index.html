@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Progresso</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f172a;
+      --card2:#111c33;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --line:rgba(148,163,184,.18);
+      --acc:#22c55e;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --shadow: 0 12px 32px rgba(0,0,0,.35);
+      --radius: 18px;
+      --radius2: 14px;
+      --pad: 14px;
+      --tap: 52px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; background: radial-gradient(1200px 800px at 20% -10%, #1f2a44 0%, transparent 60%),
+               radial-gradient(900px 700px at 100% 0%, #19344a 0%, transparent 55%),
+               var(--bg);
+      color:var(--text);
+    }
+    .safe{
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      min-height: 100vh;
+    }
+    header{
+      position: sticky; top:0; z-index:10;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(to bottom, rgba(11,18,32,.92), rgba(11,18,32,.72));
+      border-bottom: 1px solid var(--line);
+    }
+    .wrap{max-width: 720px; margin: 0 auto; padding: 14px 14px;}
+    .row{display:flex; align-items:center; gap:10px}
+    .space{justify-content:space-between}
+    .title{
+      font-size: 18px; font-weight: 800; letter-spacing:.2px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .pill{
+      font-size:12px; color:var(--muted);
+      border:1px solid var(--line); padding:6px 10px; border-radius:999px;
+      background: rgba(15,23,42,.5);
+    }
+    .btn{
+      height: var(--tap);
+      padding: 0 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: linear-gradient(to bottom, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      color: var(--text);
+      font-weight: 700;
+      display:flex; align-items:center; justify-content:center;
+      gap:10px;
+      cursor:pointer;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 8px 18px rgba(0,0,0,.22);
+    }
+    .btn:active{transform: translateY(1px)}
+    .btn.primary{
+      border-color: rgba(34,197,94,.35);
+      background: linear-gradient(to bottom, rgba(34,197,94,.25), rgba(34,197,94,.12));
+    }
+    .btn.danger{
+      border-color: rgba(239,68,68,.35);
+      background: linear-gradient(to bottom, rgba(239,68,68,.20), rgba(239,68,68,.10));
+    }
+    .btn.ghost{
+      background: rgba(15,23,42,.35);
+      box-shadow: none;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+      padding: 14px;
+      max-width: 720px;
+      margin: 0 auto 90px;
+    }
+    .card{
+      background: linear-gradient(to bottom, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .top{
+      padding: 14px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      background: rgba(15,23,42,.35);
+      border-bottom: 1px solid var(--line);
+    }
+    .goalHead{display:flex; gap:12px; align-items:center; min-width:0}
+    .emoji{
+      width:44px; height:44px; border-radius: 14px;
+      display:grid; place-items:center;
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--line);
+      font-size: 22px;
+      flex: 0 0 auto;
+    }
+    .goalMeta{min-width:0}
+    .goalName{font-weight:900; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+    .goalSub{font-size:12px; color:var(--muted); margin-top:2px}
+    .countBig{font-weight: 900; font-size: 22px}
+    .body{padding: 14px}
+    .opts{
+      display:flex; flex-wrap:wrap; gap:10px;
+    }
+    .chip{
+      min-height: 44px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background: rgba(15,23,42,.45);
+      color: var(--text);
+      font-weight: 800;
+      cursor:pointer;
+      display:flex; align-items:center; gap:8px;
+      -webkit-tap-highlight-color: transparent;
+      user-select:none;
+    }
+    .chip:active{transform: translateY(1px)}
+    .chip small{color:var(--muted); font-weight:800}
+    .muted{color:var(--muted)}
+    .empty{
+      text-align:center; padding: 26px 16px;
+      color: var(--muted);
+    }
+    .footerBar{
+      position: fixed; left:0; right:0; bottom:0; z-index:20;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(to top, rgba(11,18,32,.92), rgba(11,18,32,.72));
+      border-top: 1px solid var(--line);
+    }
+    .footerInner{
+      max-width: 720px; margin:0 auto; padding: 12px 14px;
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+    }
+    .search{
+      flex:1;
+      height: var(--tap);
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(15,23,42,.45);
+      color: var(--text);
+      padding: 0 12px;
+      font-weight: 700;
+      outline:none;
+    }
+
+    /* Modal */
+    .modalOverlay{
+      position:fixed; inset:0; z-index:50;
+      background: rgba(0,0,0,.55);
+      display:none;
+      align-items:flex-end;
+      padding: 14px;
+    }
+    .modal{
+      width:100%;
+      max-width: 720px;
+      margin: 0 auto;
+      border-radius: 22px;
+      background: linear-gradient(to bottom, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modalHeader{
+      padding: 14px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(15,23,42,.35);
+    }
+    .modalTitle{font-weight: 900}
+    .modalBody{padding: 14px; display:grid; gap:12px}
+    .field{
+      display:grid; gap:6px;
+    }
+    .label{font-size:12px; color:var(--muted); font-weight: 800}
+    .input{
+      height: var(--tap);
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(15,23,42,.45);
+      color: var(--text);
+      padding: 0 12px;
+      font-weight: 800;
+      outline:none;
+    }
+    .row2{display:grid; grid-template-columns: 1fr 120px; gap:10px}
+    .hint{font-size:12px; color: var(--muted); line-height: 1.35}
+    .modalActions{
+      display:flex; gap:10px; padding: 14px;
+      border-top: 1px solid var(--line);
+      background: rgba(15,23,42,.35);
+    }
+    .modalActions .btn{flex:1}
+
+    /* Page overlay (Goal detail) */
+    .page{
+      position:fixed; inset:0; z-index:40;
+      background: var(--bg);
+      display:none;
+    }
+    .page header{position: sticky}
+    .divider{height:1px; background: var(--line); margin: 10px 0}
+    .listCol{display:grid; gap:10px}
+    .optBtn{
+      width:100%;
+      min-height: 54px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(15,23,42,.45);
+      color: var(--text);
+      font-weight: 900;
+      padding: 12px 14px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      cursor:pointer; user-select:none; -webkit-tap-highlight-color: transparent;
+    }
+    .optBtn:active{transform: translateY(1px)}
+    .optBtn small{color:var(--muted); font-weight: 900}
+    .kpiRow{display:flex; gap:10px; flex-wrap:wrap}
+    .kpi{
+      flex: 1 1 160px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(15,23,42,.35);
+      padding: 12px 14px;
+    }
+    .kpi .k{color:var(--muted); font-size:12px; font-weight:900}
+    .kpi .v{font-size:20px; font-weight: 900; margin-top:4px}
+    .tiny{font-size:12px; color:var(--muted)}
+    .linkBtn{
+      border:none; background: transparent; color: var(--text);
+      font-weight: 900; cursor:pointer; padding: 10px 0;
+      text-decoration: underline;
+      text-decoration-color: rgba(229,231,235,.35);
+      text-underline-offset: 3px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="safe">
+    <header>
+      <div class="wrap row space">
+        <div class="title">📌 Progresso <span id="installHint" class="pill">PWA</span></div>
+        <button class="btn primary" id="btnNewGoal">➕ Nova lista</button>
+      </div>
+    </header>
+
+    <main>
+      <div class="grid" id="goalsGrid"></div>
+      <div class="empty" id="emptyState" style="display:none">
+        <div style="font-size:28px; margin-bottom:6px;">✨</div>
+        Crie sua primeira lista/objetivo e registre progresso tocando nos resultados.
+      </div>
+    </main>
+
+    <div class="footerBar">
+      <div class="footerInner">
+        <input id="search" class="search" placeholder="Buscar lista/objetivo..." />
+        <button class="btn ghost" id="btnExport">⬇️ Exportar</button>
+        <button class="btn ghost" id="btnImport">⬆️ Importar</button>
+      </div>
+    </div>
+
+    <!-- Modal: New/Edit Goal -->
+    <div class="modalOverlay" id="goalModal">
+      <div class="modal">
+        <div class="modalHeader">
+          <div class="modalTitle" id="goalModalTitle">Nova lista</div>
+          <button class="btn ghost" id="goalModalClose">✕</button>
+        </div>
+        <div class="modalBody">
+          <div class="field">
+            <div class="label">Nome do objetivo/lista</div>
+            <input class="input" id="goalName" placeholder="Ex.: Treino" maxlength="40" />
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <div class="label">Emoji</div>
+              <input class="input" id="goalEmoji" placeholder="Ex.: 💪" maxlength="2" />
+              <div class="hint">Dica: copie e cole um emoji do teclado.</div>
+            </div>
+            <div class="field">
+              <div class="label">Meta (opcional)</div>
+              <input class="input" id="goalTarget" placeholder="Ex.: 30" inputmode="numeric" />
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="field">
+            <div class="label">Adicionar opções (resultados selecionáveis)</div>
+            <div class="row" style="gap:10px;">
+              <input class="input" id="optText" placeholder="Ex.: ✅ Feito" maxlength="40" style="flex:1;" />
+              <button class="btn" id="btnAddOpt">➕</button>
+            </div>
+            <div class="hint">Ex.: “✅ Feito”, “⏱️ 10 min”, “🏃 3 km”, “📚 20 páginas”.</div>
+          </div>
+
+          <div class="field">
+            <div class="label">Opções atuais</div>
+            <div class="opts" id="optsPreview"></div>
+            <div class="hint">Toque numa opção para remover.</div>
+          </div>
+        </div>
+        <div class="modalActions">
+          <button class="btn danger" id="btnDeleteGoal" style="display:none">🗑️ Excluir</button>
+          <button class="btn primary" id="btnSaveGoal">💾 Salvar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page: Goal detail -->
+    <div class="page" id="goalPage">
+      <header>
+        <div class="wrap row space">
+          <button class="btn ghost" id="btnBack">← Voltar</button>
+          <div class="title" id="pageTitle">Objetivo</div>
+          <button class="btn" id="btnEdit">✏️ Editar</button>
+        </div>
+      </header>
+      <div class="wrap" style="padding: 14px;">
+        <div class="kpiRow">
+          <div class="kpi">
+            <div class="k">Total registrado</div>
+            <div class="v" id="kpiTotal">0</div>
+          </div>
+          <div class="kpi" id="kpiTargetBox" style="display:none">
+            <div class="k">Meta</div>
+            <div class="v" id="kpiTarget">—</div>
+            <div class="tiny" id="kpiTargetSub"></div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="muted" style="font-weight:900; margin-bottom:10px;">Toque para registrar</div>
+        <div class="listCol" id="optButtons"></div>
+
+        <div class="divider"></div>
+
+        <div class="row space">
+          <button class="btn ghost" id="btnUndo">↩️ Desfazer último</button>
+          <button class="btn ghost" id="btnClear">🧹 Zerar registros</button>
+        </div>
+
+        <div style="margin-top: 10px;">
+          <button class="linkBtn" id="btnShowLog">Ver últimos registros</button>
+          <div id="logBox" style="display:none; margin-top:10px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // ---------- PWA: service worker ----------
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  }
+
+  // ---------- State ----------
+  const KEY = "progress_pwa_v1";
+  const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
+
+  /** data shape:
+    {
+      goals: [
+        { id, name, emoji, target: number|null, options: [{id, text}], log: [{t, optId}] }
+      ]
+    }
+  */
+  const load = () => {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return { goals: [] };
+      const parsed = JSON.parse(raw);
+      if (!parsed || !Array.isArray(parsed.goals)) return { goals: [] };
+      return parsed;
+    } catch {
+      return { goals: [] };
+    }
+  };
+  const save = () => localStorage.setItem(KEY, JSON.stringify(state));
+  let state = load();
+
+  // ---------- Elements ----------
+  const goalsGrid = document.getElementById("goalsGrid");
+  const emptyState = document.getElementById("emptyState");
+  const search = document.getElementById("search");
+
+  const goalModal = document.getElementById("goalModal");
+  const goalModalTitle = document.getElementById("goalModalTitle");
+  const goalModalClose = document.getElementById("goalModalClose");
+  const btnNewGoal = document.getElementById("btnNewGoal");
+  const btnSaveGoal = document.getElementById("btnSaveGoal");
+  const btnDeleteGoal = document.getElementById("btnDeleteGoal");
+
+  const goalName = document.getElementById("goalName");
+  const goalEmoji = document.getElementById("goalEmoji");
+  const goalTarget = document.getElementById("goalTarget");
+  const optText = document.getElementById("optText");
+  const btnAddOpt = document.getElementById("btnAddOpt");
+  const optsPreview = document.getElementById("optsPreview");
+
+  const goalPage = document.getElementById("goalPage");
+  const pageTitle = document.getElementById("pageTitle");
+  const btnBack = document.getElementById("btnBack");
+  const btnEdit = document.getElementById("btnEdit");
+  const optButtons = document.getElementById("optButtons");
+  const kpiTotal = document.getElementById("kpiTotal");
+  const kpiTargetBox = document.getElementById("kpiTargetBox");
+  const kpiTarget = document.getElementById("kpiTarget");
+  const kpiTargetSub = document.getElementById("kpiTargetSub");
+  const btnUndo = document.getElementById("btnUndo");
+  const btnClear = document.getElementById("btnClear");
+  const btnShowLog = document.getElementById("btnShowLog");
+  const logBox = document.getElementById("logBox");
+
+  const btnExport = document.getElementById("btnExport");
+  const btnImport = document.getElementById("btnImport");
+
+  // ---------- Modal working buffer ----------
+  let editingGoalId = null;
+  let tempOptions = [];
+
+  // ---------- Helpers ----------
+  const byId = (id) => state.goals.find(g => g.id === id);
+  const fmtDate = (ms) => {
+    const d = new Date(ms);
+    const dd = String(d.getDate()).padStart(2,"0");
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const hh = String(d.getHours()).padStart(2,"0");
+    const mi = String(d.getMinutes()).padStart(2,"0");
+    return `${dd}/${mm} ${hh}:${mi}`;
+  };
+  const escapeHTML = (s) => s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+  const totalCount = (g) => (g.log?.length || 0);
+  const countByOpt = (g) => {
+    const map = new Map();
+    (g.options || []).forEach(o => map.set(o.id, 0));
+    (g.log || []).forEach(e => map.set(e.optId, (map.get(e.optId)||0) + 1));
+    return map;
+  };
+
+  // ---------- Render home ----------
+  function renderHome() {
+    const q = (search.value || "").trim().toLowerCase();
+    const goals = state.goals
+      .slice()
+      .sort((a,b) => (totalCount(b) - totalCount(a)) || (a.name.localeCompare(b.name)));
+
+    const filtered = q ? goals.filter(g =>
+      (g.name||"").toLowerCase().includes(q) || (g.emoji||"").includes(q)
+    ) : goals;
+
+    goalsGrid.innerHTML = "";
+    emptyState.style.display = (state.goals.length === 0) ? "block" : "none";
+
+    filtered.forEach(g => {
+      const c = totalCount(g);
+      const map = countByOpt(g);
+      const breakdown = (g.options||[])
+        .map(o => `<span class="chip" data-open="${g.id}">
+          ${escapeHTML(o.text)} <small>· ${map.get(o.id)||0}</small>
+        </span>`)
+        .join("");
+
+      const target = (typeof g.target === "number" && !Number.isNaN(g.target) && g.target > 0) ? g.target : null;
+      const sub = target ? `Meta: ${c}/${target}` : `${(g.options||[]).length} opção(ões)`;
+
+      const el = document.createElement("div");
+      el.className = "card";
+      el.innerHTML = `
+        <div class="top">
+          <div class="goalHead">
+            <div class="emoji">${escapeHTML(g.emoji || "🎯")}</div>
+            <div class="goalMeta">
+              <div class="goalName">${escapeHTML(g.name || "Sem nome")}</div>
+              <div class="goalSub">${escapeHTML(sub)}</div>
+            </div>
+          </div>
+          <div class="countBig">${c}</div>
+        </div>
+        <div class="body">
+          <div class="muted" style="font-weight:900; margin-bottom:10px;">Toque para registrar</div>
+          <div class="opts">
+            ${(g.options||[]).slice(0,6).map(o => `
+              <button class="chip" data-quick="${g.id}" data-opt="${o.id}">
+                ${escapeHTML(o.text)} <small>+1</small>
+              </button>
+            `).join("")}
+            ${(g.options||[]).length > 6 ? `<span class="chip" data-open="${g.id}">Ver mais…</span>` : ``}
+            ${(g.options||[]).length === 0 ? `<span class="chip" data-open="${g.id}">Adicionar opções…</span>` : ``}
+          </div>
+        </div>
+      `;
+      goalsGrid.appendChild(el);
+    });
+
+    // bind
+    goalsGrid.querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openGoalPage(b.dataset.open)));
+    goalsGrid.querySelectorAll("[data-quick]").forEach(b => b.addEventListener("click", () => {
+      const gid = b.dataset.quick;
+      const optId = b.dataset.opt;
+      logHit(gid, optId);
+      renderHome();
+      // micro feedback:
+      b.animate([{transform:"scale(.98)"},{transform:"scale(1)"}], {duration:140});
+    }));
+  }
+
+  // ---------- Goal page ----------
+  let currentGoalId = null;
+
+  function openGoalPage(id) {
+    const g = byId(id);
+    if (!g) return;
+    currentGoalId = id;
+
+    pageTitle.textContent = `${g.emoji || "🎯"} ${g.name || "Objetivo"}`;
+    goalPage.style.display = "block";
+    document.body.style.overflow = "hidden";
+
+    renderGoalPage();
+  }
+
+  function closeGoalPage() {
+    goalPage.style.display = "none";
+    document.body.style.overflow = "";
+    currentGoalId = null;
+    logBox.style.display = "none";
+    logBox.innerHTML = "";
+    btnShowLog.textContent = "Ver últimos registros";
+  }
+
+  function renderGoalPage() {
+    const g = byId(currentGoalId);
+    if (!g) return closeGoalPage();
+
+    const total = totalCount(g);
+    kpiTotal.textContent = total;
+
+    const target = (typeof g.target === "number" && !Number.isNaN(g.target) && g.target > 0) ? g.target : null;
+    if (target) {
+      kpiTargetBox.style.display = "block";
+      kpiTarget.textContent = target;
+      const pct = Math.min(100, Math.round((total/target)*100));
+      kpiTargetSub.textContent = `${pct}% concluído`;
+    } else {
+      kpiTargetBox.style.display = "none";
+    }
+
+    const map = countByOpt(g);
+    optButtons.innerHTML = "";
+
+    if (!g.options || g.options.length === 0) {
+      const warn = document.createElement("div");
+      warn.className = "card";
+      warn.innerHTML = `<div class="body">
+        <div style="font-weight:900; margin-bottom:8px;">Sem opções ainda</div>
+        <div class="muted">Toque em <b>Editar</b> para adicionar resultados selecionáveis.</div>
+      </div>`;
+      optButtons.appendChild(warn);
+      return;
+    }
+
+    g.options.forEach(o => {
+      const btn = document.createElement("button");
+      btn.className = "optBtn";
+      btn.innerHTML = `<span>${escapeHTML(o.text)}</span><small>${map.get(o.id)||0}</small>`;
+      btn.addEventListener("click", () => {
+        logHit(g.id, o.id);
+        renderGoalPage();
+        renderHome();
+      });
+      optButtons.appendChild(btn);
+    });
+  }
+
+  // ---------- Logging ----------
+  function logHit(goalId, optId) {
+    const g = byId(goalId);
+    if (!g) return;
+    if (!g.log) g.log = [];
+    g.log.push({ t: Date.now(), optId });
+    save();
+  }
+
+  // ---------- Modal (create/edit) ----------
+  function openGoalModal(mode, goalId=null) {
+    editingGoalId = goalId;
+    goalModalTitle.textContent = mode === "edit" ? "Editar lista" : "Nova lista";
+
+    if (mode === "edit") {
+      const g = byId(goalId);
+      if (!g) return;
+      goalName.value = g.name || "";
+      goalEmoji.value = g.emoji || "";
+      goalTarget.value = (typeof g.target === "number" && g.target > 0) ? String(g.target) : "";
+      tempOptions = (g.options || []).map(o => ({...o}));
+      btnDeleteGoal.style.display = "inline-flex";
+    } else {
+      goalName.value = "";
+      goalEmoji.value = "";
+      goalTarget.value = "";
+      tempOptions = [];
+      btnDeleteGoal.style.display = "none";
+    }
+
+    optText.value = "";
+    renderOptPreview();
+
+    goalModal.style.display = "flex";
+    setTimeout(() => goalName.focus(), 50);
+  }
+
+  function closeGoalModal() {
+    goalModal.style.display = "none";
+    editingGoalId = null;
+    tempOptions = [];
+  }
+
+  function renderOptPreview() {
+    optsPreview.innerHTML = "";
+    tempOptions.forEach(o => {
+      const chip = document.createElement("button");
+      chip.className = "chip";
+      chip.innerHTML = `${escapeHTML(o.text)} <small>remover</small>`;
+      chip.addEventListener("click", () => {
+        tempOptions = tempOptions.filter(x => x.id !== o.id);
+        renderOptPreview();
+      });
+      optsPreview.appendChild(chip);
+    });
+    if (tempOptions.length === 0) {
+      optsPreview.innerHTML = `<span class="muted">Nenhuma opção adicionada ainda.</span>`;
+    }
+  }
+
+  function addTempOpt() {
+    const t = (optText.value || "").trim();
+    if (!t) return;
+    tempOptions.push({ id: uid(), text: t });
+    optText.value = "";
+    renderOptPreview();
+    optText.focus();
+  }
+
+  function saveGoal() {
+    const name = (goalName.value || "").trim() || "Sem nome";
+    const emoji = (goalEmoji.value || "").trim() || "🎯";
+    const targetRaw = (goalTarget.value || "").trim();
+    const target = targetRaw ? Number(targetRaw) : null;
+    const targetOk = (target !== null && Number.isFinite(target) && target > 0) ? Math.floor(target) : null;
+
+    if (editingGoalId) {
+      const g = byId(editingGoalId);
+      if (!g) return;
+      g.name = name;
+      g.emoji = emoji;
+      g.target = targetOk;
+      const oldOptIds = new Set((g.options||[]).map(o => o.id));
+      const newOptIds = new Set(tempOptions.map(o => o.id));
+
+      // Remove logs that reference deleted options
+      g.log = (g.log || []).filter(e => newOptIds.has(e.optId));
+
+      // Replace options
+      g.options = tempOptions;
+
+      // If goal page open, refresh title
+      if (currentGoalId === g.id) {
+        pageTitle.textContent = `${g.emoji || "🎯"} ${g.name || "Objetivo"}`;
+      }
+    } else {
+      state.goals.push({
+        id: uid(),
+        name,
+        emoji,
+        target: targetOk,
+        options: tempOptions,
+        log: []
+      });
+    }
+
+    save();
+    closeGoalModal();
+    renderHome();
+    if (currentGoalId) renderGoalPage();
+  }
+
+  function deleteGoal() {
+    if (!editingGoalId) return;
+    const g = byId(editingGoalId);
+    if (!g) return;
+    if (!confirm(`Excluir "${g.name}"? Isso apaga os registros.`)) return;
+
+    state.goals = state.goals.filter(x => x.id !== editingGoalId);
+    save();
+    closeGoalModal();
+    if (currentGoalId === editingGoalId) closeGoalPage();
+    renderHome();
+  }
+
+  // ---------- Export / Import ----------
+  function exportData() {
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `progresso-backup-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  async function importData() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/json";
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      try {
+        const txt = await file.text();
+        const parsed = JSON.parse(txt);
+        if (!parsed || !Array.isArray(parsed.goals)) throw new Error("Formato inválido");
+        state = parsed;
+        save();
+        renderHome();
+        alert("Importado com sucesso!");
+      } catch (e) {
+        alert("Não consegui importar esse arquivo. Verifique se é um backup válido.");
+      }
+    };
+    input.click();
+  }
+
+  // ---------- Install hint ----------
+  const installHint = document.getElementById("installHint");
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+  installHint.textContent = isStandalone ? "Instalado" : "Adicionar à tela inicial";
+  if (!isStandalone) {
+    // (Chrome/Android) capture install prompt if available
+    let deferredPrompt = null;
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installHint.textContent = "Instalar";
+      installHint.style.cursor = "pointer";
+      installHint.onclick = async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        deferredPrompt = null;
+      };
+    });
+  }
+
+  // ---------- Events ----------
+  btnNewGoal.addEventListener("click", () => openGoalModal("new"));
+  goalModalClose.addEventListener("click", closeGoalModal);
+  goalModal.addEventListener("click", (e) => { if (e.target === goalModal) closeGoalModal(); });
+
+  btnAddOpt.addEventListener("click", addTempOpt);
+  optText.addEventListener("keydown", (e) => { if (e.key === "Enter") addTempOpt(); });
+
+  btnSaveGoal.addEventListener("click", saveGoal);
+  btnDeleteGoal.addEventListener("click", deleteGoal);
+
+  search.addEventListener("input", renderHome);
+
+  btnBack.addEventListener("click", closeGoalPage);
+  btnEdit.addEventListener("click", () => openGoalModal("edit", currentGoalId));
+
+  btnUndo.addEventListener("click", () => {
+    const g = byId(currentGoalId);
+    if (!g || !g.log || g.log.length === 0) return;
+    g.log.pop();
+    save();
+    renderGoalPage();
+    renderHome();
+  });
+
+  btnClear.addEventListener("click", () => {
+    const g = byId(currentGoalId);
+    if (!g) return;
+    if (!confirm("Zerar todos os registros desse objetivo?")) return;
+    g.log = [];
+    save();
+    renderGoalPage();
+    renderHome();
+  });
+
+  btnShowLog.addEventListener("click", () => {
+    const g = byId(currentGoalId);
+    if (!g) return;
+    if (logBox.style.display === "none") {
+      const last = (g.log || []).slice(-20).reverse();
+      const optMap = new Map((g.options||[]).map(o => [o.id, o.text]));
+      logBox.innerHTML = last.length
+        ? `<div class="card"><div class="body"><div style="font-weight:900; margin-bottom:8px;">Últimos 20 registros</div>
+            <div class="tiny">${last.map(e => `• ${escapeHTML(optMap.get(e.optId)||"—")} <span class="muted">(${fmtDate(e.t)})</span>`).join("<br>")}</div>
+           </div></div>`
+        : `<div class="muted">Nenhum registro ainda.</div>`;
+      logBox.style.display = "block";
+      btnShowLog.textContent = "Ocultar últimos registros";
+    } else {
+      logBox.style.display = "none";
+      logBox.innerHTML = "";
+      btnShowLog.textContent = "Ver últimos registros";
+    }
+  });
+
+  btnExport.addEventListener("click", exportData);
+  btnImport.addEventListener("click", importData);
+
+  // ---------- Initial render ----------
+  renderHome();
+})();
+</script>
+</body>
+</html>
