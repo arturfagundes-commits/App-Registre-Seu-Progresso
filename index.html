@@ -13,18 +13,11 @@
   <style>
     :root{
       --bg:#0b1220;
-      --card:#0f172a;
-      --card2:#111c33;
       --text:#e5e7eb;
       --muted:#94a3b8;
       --line:rgba(148,163,184,.18);
-      --acc:#22c55e;
-      --warn:#f59e0b;
-      --bad:#ef4444;
       --shadow: 0 12px 32px rgba(0,0,0,.35);
       --radius: 18px;
-      --radius2: 14px;
-      --pad: 14px;
       --tap: 52px;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
@@ -51,11 +44,6 @@
     .title{
       font-size: 18px; font-weight: 800; letter-spacing:.2px;
       display:flex; align-items:center; gap:10px;
-    }
-    .pill{
-      font-size:12px; color:var(--muted);
-      border:1px solid var(--line); padding:6px 10px; border-radius:999px;
-      background: rgba(15,23,42,.5);
     }
     .btn{
       height: var(--tap);
@@ -85,13 +73,19 @@
       background: rgba(15,23,42,.35);
       box-shadow: none;
     }
+    .btn.icon{
+      width: var(--tap);
+      padding: 0;
+      border-radius: 14px;
+    }
+
     .grid{
       display:grid;
       grid-template-columns: 1fr;
       gap:12px;
       padding: 14px;
       max-width: 720px;
-      margin: 0 auto 90px;
+      margin: 0 auto;
     }
     .card{
       background: linear-gradient(to bottom, rgba(255,255,255,.05), rgba(255,255,255,.02));
@@ -118,7 +112,7 @@
     .goalMeta{min-width:0}
     .goalName{font-weight:900; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
     .goalSub{font-size:12px; color:var(--muted); margin-top:2px}
-    .countBig{font-weight: 900; font-size: 22px}
+
     .body{padding: 14px}
     .opts{
       display:flex; flex-wrap:wrap; gap:10px;
@@ -143,32 +137,11 @@
       text-align:center; padding: 26px 16px;
       color: var(--muted);
     }
-    .footerBar{
-      position: fixed; left:0; right:0; bottom:0; z-index:20;
-      backdrop-filter: blur(10px);
-      background: linear-gradient(to top, rgba(11,18,32,.92), rgba(11,18,32,.72));
-      border-top: 1px solid var(--line);
-    }
-    .footerInner{
-      max-width: 720px; margin:0 auto; padding: 12px 14px;
-      display:flex; gap:10px; align-items:center; justify-content:space-between;
-    }
-    .search{
-      flex:1;
-      height: var(--tap);
-      border-radius: 14px;
-      border: 1px solid var(--line);
-      background: rgba(15,23,42,.45);
-      color: var(--text);
-      padding: 0 12px;
-      font-weight: 700;
-      outline:none;
-    }
 
     /* Modal */
     .modalOverlay{
       position:fixed; inset:0; z-index:50;
-      background: rgba(0,0,0,.55);
+      background: rgba(0,0,0,.88); /* MAIS OPACO */
       display:none;
       align-items:flex-end;
       padding: 14px;
@@ -178,28 +151,26 @@
       max-width: 720px;
       margin: 0 auto;
       border-radius: 22px;
-      background: linear-gradient(to bottom, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border: 1px solid var(--line);
+      background: rgba(15,23,42,.98); /* quase sem transparência */
+      border: 1px solid rgba(148,163,184,.28);
       box-shadow: var(--shadow);
       overflow:hidden;
     }
     .modalHeader{
       padding: 14px;
       display:flex; align-items:center; justify-content:space-between; gap:10px;
-      border-bottom: 1px solid var(--line);
-      background: rgba(15,23,42,.35);
+      border-bottom: 1px solid rgba(148,163,184,.22);
+      background: rgba(17,28,51,.95);
     }
     .modalTitle{font-weight: 900}
     .modalBody{padding: 14px; display:grid; gap:12px}
-    .field{
-      display:grid; gap:6px;
-    }
+    .field{display:grid; gap:6px;}
     .label{font-size:12px; color:var(--muted); font-weight: 800}
     .input{
       height: var(--tap);
       border-radius: 14px;
-      border: 1px solid var(--line);
-      background: rgba(15,23,42,.45);
+      border: 1px solid rgba(148,163,184,.22);
+      background: rgba(11,18,32,.85);
       color: var(--text);
       padding: 0 12px;
       font-weight: 800;
@@ -209,12 +180,12 @@
     .hint{font-size:12px; color: var(--muted); line-height: 1.35}
     .modalActions{
       display:flex; gap:10px; padding: 14px;
-      border-top: 1px solid var(--line);
-      background: rgba(15,23,42,.35);
+      border-top: 1px solid rgba(148,163,184,.22);
+      background: rgba(17,28,51,.95);
     }
     .modalActions .btn{flex:1}
 
-    /* Page overlay (Goal detail) */
+    /* Page overlay */
     .page{
       position:fixed; inset:0; z-index:40;
       background: var(--bg);
@@ -262,7 +233,7 @@
   <div class="safe">
     <header>
       <div class="wrap row space">
-        <div class="title">📌 Progresso <span id="installHint" class="pill">PWA</span></div>
+        <div class="title">📌 Progresso</div>
         <button class="btn primary" id="btnNewGoal">➕ Nova lista</button>
       </div>
     </header>
@@ -275,14 +246,6 @@
       </div>
     </main>
 
-    <div class="footerBar">
-      <div class="footerInner">
-        <input id="search" class="search" placeholder="Buscar lista/objetivo..." />
-        <button class="btn ghost" id="btnExport">⬇️ Exportar</button>
-        <button class="btn ghost" id="btnImport">⬆️ Importar</button>
-      </div>
-    </div>
-
     <!-- Modal: New/Edit Goal -->
     <div class="modalOverlay" id="goalModal">
       <div class="modal">
@@ -293,13 +256,13 @@
         <div class="modalBody">
           <div class="field">
             <div class="label">Nome do objetivo/lista</div>
-            <input class="input" id="goalName" placeholder="Ex.: Treino" maxlength="40" />
+            <input class="input" id="goalName" placeholder="Ex.: Horas trabalhadas" maxlength="40" />
           </div>
 
           <div class="row2">
             <div class="field">
               <div class="label">Emoji</div>
-              <input class="input" id="goalEmoji" placeholder="Ex.: 💪" maxlength="2" />
+              <input class="input" id="goalEmoji" placeholder="Ex.: 💼" maxlength="2" />
               <div class="hint">Dica: copie e cole um emoji do teclado.</div>
             </div>
             <div class="field">
@@ -313,10 +276,10 @@
           <div class="field">
             <div class="label">Adicionar opções (resultados selecionáveis)</div>
             <div class="row" style="gap:10px;">
-              <input class="input" id="optText" placeholder="Ex.: ✅ Feito" maxlength="40" style="flex:1;" />
+              <input class="input" id="optText" placeholder="Ex.: 1 hora / 3 horas / 500 ml / 250 kcal" maxlength="40" style="flex:1;" />
               <button class="btn" id="btnAddOpt">➕</button>
             </div>
-            <div class="hint">Ex.: “✅ Feito”, “⏱️ 10 min”, “🏃 3 km”, “📚 20 páginas”.</div>
+            <div class="hint">Dica: coloque número + unidade (ex.: “3 horas”, “500 ml”, “250 kcal”).</div>
           </div>
 
           <div class="field">
@@ -341,12 +304,22 @@
           <button class="btn" id="btnEdit">✏️ Editar</button>
         </div>
       </header>
+
       <div class="wrap" style="padding: 14px;">
         <div class="kpiRow">
           <div class="kpi">
-            <div class="k">Total registrado</div>
-            <div class="v" id="kpiTotal">0</div>
+            <div class="k">Hoje</div>
+            <div class="v" id="kpiToday">0</div>
           </div>
+          <div class="kpi">
+            <div class="k">Semana</div>
+            <div class="v" id="kpiWeek">0</div>
+          </div>
+          <div class="kpi">
+            <div class="k">Geral</div>
+            <div class="v" id="kpiAll">0</div>
+          </div>
+
           <div class="kpi" id="kpiTargetBox" style="display:none">
             <div class="k">Meta</div>
             <div class="v" id="kpiTarget">—</div>
@@ -385,13 +358,6 @@
   const KEY = "progress_pwa_v1";
   const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
 
-  /** data shape:
-    {
-      goals: [
-        { id, name, emoji, target: number|null, options: [{id, text}], log: [{t, optId}] }
-      ]
-    }
-  */
   const load = () => {
     try {
       const raw = localStorage.getItem(KEY);
@@ -409,7 +375,6 @@
   // ---------- Elements ----------
   const goalsGrid = document.getElementById("goalsGrid");
   const emptyState = document.getElementById("emptyState");
-  const search = document.getElementById("search");
 
   const goalModal = document.getElementById("goalModal");
   const goalModalTitle = document.getElementById("goalModalTitle");
@@ -430,17 +395,19 @@
   const btnBack = document.getElementById("btnBack");
   const btnEdit = document.getElementById("btnEdit");
   const optButtons = document.getElementById("optButtons");
-  const kpiTotal = document.getElementById("kpiTotal");
+
+  const kpiToday = document.getElementById("kpiToday");
+  const kpiWeek = document.getElementById("kpiWeek");
+  const kpiAll = document.getElementById("kpiAll");
+
   const kpiTargetBox = document.getElementById("kpiTargetBox");
   const kpiTarget = document.getElementById("kpiTarget");
   const kpiTargetSub = document.getElementById("kpiTargetSub");
+
   const btnUndo = document.getElementById("btnUndo");
   const btnClear = document.getElementById("btnClear");
   const btnShowLog = document.getElementById("btnShowLog");
   const logBox = document.getElementById("logBox");
-
-  const btnExport = document.getElementById("btnExport");
-  const btnImport = document.getElementById("btnImport");
 
   // ---------- Modal working buffer ----------
   let editingGoalId = null;
@@ -448,6 +415,7 @@
 
   // ---------- Helpers ----------
   const byId = (id) => state.goals.find(g => g.id === id);
+
   const fmtDate = (ms) => {
     const d = new Date(ms);
     const dd = String(d.getDate()).padStart(2,"0");
@@ -456,41 +424,133 @@
     const mi = String(d.getMinutes()).padStart(2,"0");
     return `${dd}/${mm} ${hh}:${mi}`;
   };
+
   const escapeHTML = (s) => s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
-  const totalCount = (g) => (g.log?.length || 0);
-  const countByOpt = (g) => {
+  // Início do dia (00:00)
+  const startOfDay = (d = new Date()) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+
+  // Semana: segunda 00:00 -> agora (zera toda nova segunda)
+  const startOfWeekMonday = (d = new Date()) => {
+    const day = d.getDay(); // 0=Dom,1=Seg,...6=Sáb
+    const diff = (day + 6) % 7; // Seg=0, ..., Dom=6
+    const monday = new Date(d.getFullYear(), d.getMonth(), d.getDate() - diff);
+    return new Date(monday.getFullYear(), monday.getMonth(), monday.getDate()).getTime();
+  };
+
+  // Extrai valor + unidade do texto da opção (ex.: "3 horas", "500 ml", "250 kcal")
+  function parseValueUnit(text) {
+    const raw = (text || "").toLowerCase();
+
+    // pega o primeiro número do texto
+    const m = raw.match(/-?\d+(?:[.,]\d+)?/);
+    if (!m) return { v: 1, u: "" }; // fallback: conta 1
+
+    const v = Number(m[0].replace(",", "."));
+    if (!Number.isFinite(v)) return { v: 1, u: "" };
+
+    // tenta detectar unidade
+    const unitCandidates = [
+      { re: /\bkcal\b/, u: "kcal" },
+      { re: /\bcal\b/, u: "cal" },
+      { re: /\bml\b/, u: "ml" },
+      { re: /\bl\b/, u: "L" },
+      { re: /\blitro\b|\blitros\b/, u: "L" },
+      { re: /\bmin\b|\bminuto\b|\bminutos\b/, u: "min" },
+      { re: /\bh\b|\bhora\b|\bhoras\b/, u: "h" },
+      { re: /\bkg\b/, u: "kg" },
+      { re: /\bg\b/, u: "g" },
+    ];
+
+    for (const c of unitCandidates) {
+      if (c.re.test(raw)) return { v, u: c.u };
+    }
+    return { v, u: "" };
+  }
+
+  // Formata soma por unidade (se houver múltiplas unidades na lista)
+  function formatSums(sumMap) {
+    const parts = [];
+    for (const [u, val] of sumMap.entries()) {
+      const n = Number(val);
+      if (!Number.isFinite(n) || n === 0) continue;
+
+      // tira .0 quando inteiro
+      const shown = (Math.abs(n - Math.round(n)) < 1e-9) ? String(Math.round(n)) : String(n);
+
+      parts.push(u ? `${shown} ${u}` : `${shown}`);
+    }
+    if (parts.length === 0) return "0";
+    // se tiver mais de uma unidade, separa com " • "
+    return parts.join(" • ");
+  }
+
+  function getOptTextById(g, optId) {
+    const o = (g.options || []).find(x => x.id === optId);
+    return o ? o.text : "";
+  }
+
+  // Totais agora são SOMA dos valores selecionados no período (não contagem de cliques)
+  function totals(g) {
+    const sd = startOfDay();
+    const sw = startOfWeekMonday();
+
+    const sumAll = new Map();   // unit -> sum
+    const sumWeek = new Map();
+    const sumToday = new Map();
+
+    for (const e of (g.log || [])) {
+      // Preferência: usar valor salvo no log (estável mesmo se você editar texto depois)
+      let v = e.v;
+      let u = e.u;
+
+      if (!Number.isFinite(v)) {
+        // logs antigos (antes da mudança): calcula pelo texto atual da opção
+        const parsed = parseValueUnit(getOptTextById(g, e.optId));
+        v = parsed.v;
+        u = parsed.u;
+      }
+
+      const t = e.t || 0;
+
+      // geral
+      sumAll.set(u, (sumAll.get(u) || 0) + v);
+
+      // semana
+      if (t >= sw) sumWeek.set(u, (sumWeek.get(u) || 0) + v);
+
+      // hoje
+      if (t >= sd) sumToday.set(u, (sumToday.get(u) || 0) + v);
+    }
+
+    return {
+      all: formatSums(sumAll),
+      week: formatSums(sumWeek),
+      today: formatSums(sumToday)
+    };
+  }
+
+  // Mantive contagem por opção (apenas para o número pequeno ao lado do botão, na tela da lista)
+  function countByOpt(g) {
     const map = new Map();
     (g.options || []).forEach(o => map.set(o.id, 0));
     (g.log || []).forEach(e => map.set(e.optId, (map.get(e.optId)||0) + 1));
     return map;
-  };
+  }
 
   // ---------- Render home ----------
   function renderHome() {
-    const q = (search.value || "").trim().toLowerCase();
-    const goals = state.goals
-      .slice()
-      .sort((a,b) => (totalCount(b) - totalCount(a)) || (a.name.localeCompare(b.name)));
-
-    const filtered = q ? goals.filter(g =>
-      (g.name||"").toLowerCase().includes(q) || (g.emoji||"").includes(q)
-    ) : goals;
+    const goals = state.goals.slice().sort((a,b) => {
+      // Ordenar por "Hoje" numericamente é difícil (texto). Mantém por nome.
+      return (a.name||"").localeCompare(b.name||"");
+    });
 
     goalsGrid.innerHTML = "";
     emptyState.style.display = (state.goals.length === 0) ? "block" : "none";
 
-    filtered.forEach(g => {
-      const c = totalCount(g);
-      const map = countByOpt(g);
-      const breakdown = (g.options||[])
-        .map(o => `<span class="chip" data-open="${g.id}">
-          ${escapeHTML(o.text)} <small>· ${map.get(o.id)||0}</small>
-        </span>`)
-        .join("");
-
-      const target = (typeof g.target === "number" && !Number.isNaN(g.target) && g.target > 0) ? g.target : null;
-      const sub = target ? `Meta: ${c}/${target}` : `${(g.options||[]).length} opção(ões)`;
+    goals.forEach(g => {
+      const t = totals(g);
+      const sub = `Hoje: ${t.today} · Semana: ${t.week} · Geral: ${t.all}`;
 
       const el = document.createElement("div");
       el.className = "card";
@@ -503,8 +563,10 @@
               <div class="goalSub">${escapeHTML(sub)}</div>
             </div>
           </div>
-          <div class="countBig">${c}</div>
+
+          <button class="btn ghost icon" title="Editar" aria-label="Editar" data-edit="${g.id}">✏️</button>
         </div>
+
         <div class="body">
           <div class="muted" style="font-weight:900; margin-bottom:10px;">Toque para registrar</div>
           <div class="opts">
@@ -523,12 +585,15 @@
 
     // bind
     goalsGrid.querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openGoalPage(b.dataset.open)));
-    goalsGrid.querySelectorAll("[data-quick]").forEach(b => b.addEventListener("click", () => {
-      const gid = b.dataset.quick;
-      const optId = b.dataset.opt;
-      logHit(gid, optId);
+    goalsGrid.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openGoalModal("edit", b.dataset.edit);
+    }));
+    goalsGrid.querySelectorAll("[data-quick]").forEach(b => b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      logHit(b.dataset.quick, b.dataset.opt);
       renderHome();
-      // micro feedback:
+      if (currentGoalId) renderGoalPage();
       b.animate([{transform:"scale(.98)"},{transform:"scale(1)"}], {duration:140});
     }));
   }
@@ -561,15 +626,16 @@
     const g = byId(currentGoalId);
     if (!g) return closeGoalPage();
 
-    const total = totalCount(g);
-    kpiTotal.textContent = total;
+    const t = totals(g);
+    kpiToday.textContent = t.today;
+    kpiWeek.textContent = t.week;
+    kpiAll.textContent = t.all;
 
     const target = (typeof g.target === "number" && !Number.isNaN(g.target) && g.target > 0) ? g.target : null;
     if (target) {
       kpiTargetBox.style.display = "block";
       kpiTarget.textContent = target;
-      const pct = Math.min(100, Math.round((total/target)*100));
-      kpiTargetSub.textContent = `${pct}% concluído`;
+      kpiTargetSub.textContent = `Meta (número simples)`;
     } else {
       kpiTargetBox.style.display = "none";
     }
@@ -605,8 +671,13 @@
   function logHit(goalId, optId) {
     const g = byId(goalId);
     if (!g) return;
+
+    const text = getOptTextById(g, optId);
+    const parsed = parseValueUnit(text);
+
     if (!g.log) g.log = [];
-    g.log.push({ t: Date.now(), optId });
+    // salva valor/unidade no log para manter histórico consistente
+    g.log.push({ t: Date.now(), optId, v: parsed.v, u: parsed.u });
     save();
   }
 
@@ -683,16 +754,12 @@
       g.name = name;
       g.emoji = emoji;
       g.target = targetOk;
-      const oldOptIds = new Set((g.options||[]).map(o => o.id));
+
       const newOptIds = new Set(tempOptions.map(o => o.id));
-
-      // Remove logs that reference deleted options
+      // remove logs que apontam para opções removidas
       g.log = (g.log || []).filter(e => newOptIds.has(e.optId));
-
-      // Replace options
       g.options = tempOptions;
 
-      // If goal page open, refresh title
       if (currentGoalId === g.id) {
         pageTitle.textContent = `${g.emoji || "🎯"} ${g.name || "Objetivo"}`;
       }
@@ -726,58 +793,6 @@
     renderHome();
   }
 
-  // ---------- Export / Import ----------
-  function exportData() {
-    const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `progresso-backup-${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }
-
-  async function importData() {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "application/json";
-    input.onchange = async () => {
-      const file = input.files?.[0];
-      if (!file) return;
-      try {
-        const txt = await file.text();
-        const parsed = JSON.parse(txt);
-        if (!parsed || !Array.isArray(parsed.goals)) throw new Error("Formato inválido");
-        state = parsed;
-        save();
-        renderHome();
-        alert("Importado com sucesso!");
-      } catch (e) {
-        alert("Não consegui importar esse arquivo. Verifique se é um backup válido.");
-      }
-    };
-    input.click();
-  }
-
-  // ---------- Install hint ----------
-  const installHint = document.getElementById("installHint");
-  const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
-  installHint.textContent = isStandalone ? "Instalado" : "Adicionar à tela inicial";
-  if (!isStandalone) {
-    // (Chrome/Android) capture install prompt if available
-    let deferredPrompt = null;
-    window.addEventListener("beforeinstallprompt", (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installHint.textContent = "Instalar";
-      installHint.style.cursor = "pointer";
-      installHint.onclick = async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        deferredPrompt = null;
-      };
-    });
-  }
-
   // ---------- Events ----------
   btnNewGoal.addEventListener("click", () => openGoalModal("new"));
   goalModalClose.addEventListener("click", closeGoalModal);
@@ -788,8 +803,6 @@
 
   btnSaveGoal.addEventListener("click", saveGoal);
   btnDeleteGoal.addEventListener("click", deleteGoal);
-
-  search.addEventListener("input", renderHome);
 
   btnBack.addEventListener("click", closeGoalPage);
   btnEdit.addEventListener("click", () => openGoalModal("edit", currentGoalId));
@@ -821,7 +834,11 @@
       const optMap = new Map((g.options||[]).map(o => [o.id, o.text]));
       logBox.innerHTML = last.length
         ? `<div class="card"><div class="body"><div style="font-weight:900; margin-bottom:8px;">Últimos 20 registros</div>
-            <div class="tiny">${last.map(e => `• ${escapeHTML(optMap.get(e.optId)||"—")} <span class="muted">(${fmtDate(e.t)})</span>`).join("<br>")}</div>
+            <div class="tiny">${last.map(e => {
+              const txt = escapeHTML(optMap.get(e.optId)||"—");
+              const stamp = fmtDate(e.t);
+              return `• ${txt} <span class="muted">(${stamp})</span>`;
+            }).join("<br>")}</div>
            </div></div>`
         : `<div class="muted">Nenhum registro ainda.</div>`;
       logBox.style.display = "block";
@@ -833,11 +850,21 @@
     }
   });
 
-  btnExport.addEventListener("click", exportData);
-  btnImport.addEventListener("click", importData);
+  // Atualiza automaticamente quando vira o dia (00:00)
+  function scheduleAutoRefresh() {
+    const now = new Date();
+    const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 2); // +2s
+    const ms = Math.max(2000, nextMidnight.getTime() - now.getTime());
+    setTimeout(() => {
+      renderHome();
+      if (currentGoalId) renderGoalPage();
+      scheduleAutoRefresh();
+    }, ms);
+  }
 
   // ---------- Initial render ----------
   renderHome();
+  scheduleAutoRefresh();
 })();
 </script>
 </body>
